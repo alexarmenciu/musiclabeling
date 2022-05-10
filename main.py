@@ -1,5 +1,6 @@
 from encodings import utf_8
 import os
+from turtle import up
 import dotenv
 import pydub
 import dotenv
@@ -159,3 +160,15 @@ def close_temp_folder():
         os.rmdir("./tempMusicStorage/")
 
     return
+
+
+if __name__ == "__main__":
+    """
+    call all functions to make this program an executable script as i intended it
+    """
+
+    music_files = get_music_files()
+    reduce_file_size(music_files)
+    files_with_metadata = query_acrcloud()
+    update_files_from_metadata(files_with_metadata)
+    close_temp_folder()
