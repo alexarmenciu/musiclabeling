@@ -1,3 +1,4 @@
+from encodings import utf_8
 import os
 import dotenv
 import pydub
@@ -6,6 +7,7 @@ import time
 import base64
 import hashlib
 import hmac
+import requests
 
 # going to make this project monolithic, since i want this to be as user friendly as possible so i don't want to have
 # the user cart around two scripts wherever they need the functionality
@@ -79,6 +81,24 @@ def query_acrcloud(reduced_music_files):
             hmac.new(acrcloud_access_secret.encode('ascii'),
                      string_to_sign.encode('ascii'),
                      digestmod=hashlib.sha1).digest()).decode('ascii')
+
+        f = open(file, "rb")
+        sample_bytes = os.path.getsize(file)
+        files = [('sample', f, 'audio/mpeg')]
+
+        data = {
+            'access_key': acrcloud_access_key,
+            'sample_bytes': sample_bytes,
+            'timestamp': str(timestamp),
+            'signature': sign,
+            'data_type': data_type,
+            "signature_version": signature_version
+        }
+
+        response = requests.post(acrcloud_request_url, files=files, data=data)
+        response.encoding = "utf_8"
+
+        files_with_metadata.append((file, response))
 
     return files_with_metadata
 
