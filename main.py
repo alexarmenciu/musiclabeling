@@ -8,6 +8,7 @@ import base64
 import hashlib
 import hmac
 import requests
+import eyed3
 
 # going to make this project monolithic, since i want this to be as user friendly as possible so i don't want to have
 # the user cart around two scripts wherever they need the functionality
@@ -26,7 +27,7 @@ def get_music_files():
     files = []
 
     for f in os.listdir("."):
-        if os.path.isfile(f) and (f.endswith(".mp3") or f.endswith(".wav")):
+        if os.path.isfile(f) and (f.endswith(".mp3")):
             files.append(f)
 
     return files
@@ -52,12 +53,10 @@ def reduce_file_size(files):
             first_fifteen.export("./tempMusicStorage/" + file, format=".mp3")
 
 
-def query_acrcloud(reduced_music_files):
+def query_acrcloud():
     """
     returns a list of tuples, of music files and their metadata as recognized by acrcloud
 
-    Args:
-        reduced_music_files (file list): list of music files below 1mb to be identified by acrcloud
     """
 
     files_with_metadata = []
@@ -84,7 +83,7 @@ def query_acrcloud(reduced_music_files):
 
         f = open(file, "rb")
         sample_bytes = os.path.getsize(file)
-        files = [('sample', f, 'audio/mpeg')]
+        files = [('sample', (file, f, 'audio/mpeg'))]
 
         data = {
             'access_key': acrcloud_access_key,
@@ -98,9 +97,18 @@ def query_acrcloud(reduced_music_files):
         response = requests.post(acrcloud_request_url, files=files, data=data)
         response.encoding = "utf_8"
 
-        files_with_metadata.append((file, response))
+        files_with_metadata.append((file, response.json()))
 
     return files_with_metadata
+
+
+def update_files_from_metadata(files_with_metadata):
+    """
+    updates song files in original directory with specified metadata
+
+    Args:
+        files_with_metadata (tuple list): list of tuples, first entry is a string with the name of a file, second is a metadata dictionary
+    """
 
 
 def close_temp_folder():
