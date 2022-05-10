@@ -1,6 +1,5 @@
 from encodings import utf_8
 import os
-from turtle import up
 import dotenv
 import pydub
 import dotenv
