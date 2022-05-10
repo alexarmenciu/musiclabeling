@@ -2,7 +2,6 @@ from encodings import utf_8
 import os
 import dotenv
 import pydub
-import dotenv
 import time
 import base64
 import hashlib
