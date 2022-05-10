@@ -110,6 +110,38 @@ def update_files_from_metadata(files_with_metadata):
         files_with_metadata (tuple list): list of tuples, first entry is a string with the name of a file, second is a metadata dictionary
     """
 
+    for (file, metadata) in files_with_metadata:
+        # prepare a string to specify multiple artists if such a case occurs
+
+        artiststr = ""
+        for artist in metadata["metadata"]["music"][0]["artists"]:
+            artiststr += (artist["name"] + ";")
+
+        artiststr.rstrip(";")
+
+        #load audiofile in eyed3, update tags
+
+        audiofile = eyed3.load(file)
+
+        audiofile.tag.album = metadata["metadata"]["music"][0]["album"]["name"]
+        audiofile.tag.artist = artiststr
+        audiofile.tag.title = metadata["metadata"]["music"][0]["title"]
+
+        #to update the year, you gotta update a whole bunch of metadata :smile: why couldn't eyed3 document this better :smile:
+
+        audiofile.tag.year = metadata["metadata"]["music"][0][
+            "release_date"].split("-")[0]
+        audiofile.tag.original_release_date = metadata["metadata"]["music"][0][
+            "release_date"].split("-")[0]
+        audiofile.tag.recording_date = metadata["metadata"]["music"][0][
+            "release_date"].split("-")[0]
+        audiofile.tag.tagging_date = metadata["metadata"]["music"][0][
+            "release_date"].split("-")[0]
+        audiofile.tag.encoding_date = metadata["metadata"]["music"][0][
+            "release_date"].split("-")[0]
+
+        audiofile.tag.save()
+
 
 def close_temp_folder():
     """
@@ -118,5 +150,12 @@ def close_temp_folder():
     
     :)
     """
+    # check if folder exists for good practice like the good boy i am
 
-    os.remove("./tempMusicStorage")
+    if os.path.isfile("./tempMusicStorage/"):
+        for file in os.listdir("./tempMusicStorage/"):
+            os.remove("./tempMusicStorage/" + file)
+
+        os.rmdir("./tempMusicStorage/")
+
+    return
