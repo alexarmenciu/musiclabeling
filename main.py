@@ -40,7 +40,10 @@ def reduce_file_size(files):
     Args:
         files (file list): list of music files to be reduced in size
     """
-    os.makedirs("tempMusicStorage")
+    try:
+        os.makedirs("tempMusicStorage")
+    except FileExistsError:
+        pass
 
     # iterate through each file, cut to 15 sec, save in temp folder
     for file in files:
@@ -49,7 +52,8 @@ def reduce_file_size(files):
             audio = pydub.AudioSegment.from_mp3(file=file)
             first_fifteen = audio[:15000]
 
-            first_fifteen.export("./tempMusicStorage/" + file, format=".mp3")
+            first_fifteen.export("./tempMusicStorage/" + file,
+                                 codec="libmp3lame")
 
 
 def query_acrcloud():
