@@ -155,7 +155,7 @@ def close_temp_folder():
     """
     # check if folder exists for good practice like the good boy i am
 
-    if os.path.isfile("./tempMusicStorage/"):
+    if os.path.isdir("./tempMusicStorage/"):
         for file in os.listdir("./tempMusicStorage/"):
             os.remove("./tempMusicStorage/" + file)
 
